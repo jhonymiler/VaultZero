@@ -1,0 +1,86 @@
+{
+    "name": "VaultZero - Autenticação sem Senhas",
+    "short_name": "VaultZero",
+    "description": "Plataforma revolucionária de autenticação biométrica descentralizada",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1e1b4b",
+    "theme_color": "#667eea",
+    "orientation": "portrait-primary",
+    "categories": [
+        "security",
+        "productivity",
+        "business"
+    ],
+    "lang": "pt-BR",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshot-wide.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "platform": "wide",
+            "label": "VaultZero Dashboard"
+        },
+        {
+            "src": "/screenshot-mobile.png",
+            "sizes": "360x800",
+            "type": "image/png",
+            "platform": "narrow",
+            "label": "VaultZero Mobile"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Login Rápido",
+            "short_name": "Login",
+            "description": "Acesso rápido ao login biométrico",
+            "url": "/login",
+            "icons": [
+                {
+                    "src": "/shortcut-login.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Status da Rede",
+            "short_name": "Status",
+            "description": "Verificar status da rede P2P",
+            "url": "/status",
+            "icons": [
+                {
+                    "src": "/shortcut-status.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+        "preferred_width": 400
+    }
+}

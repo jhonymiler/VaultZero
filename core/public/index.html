@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema P2P de Autenticação Sem Senha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card h3 {
+            color: #5a67d8;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .stats-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .status.active {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4fd1c7 0%, #06b6d4 100%);
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+        
+        .feature-list li {
+            padding: 5px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+        
+        #status-display {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #5a67d8;
+        }
+        
+        .api-endpoints {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .endpoint {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .endpoint:last-child {
+            border-bottom: none;
+        }
+        
+        .method {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .method.get {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        
+        .method.post {
+            background: #fed7d7;
+            color: #c53030;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Sistema P2P de Autenticação Sem Senha</h1>
+            <p>Blockchain Descentralizada com WebAuthn & Biometria</p>
+        </div>
+        
+        <div class="dashboard" id="dashboard">
+            <!-- Cards serão preenchidos dinamicamente -->
+        </div>
+        
+        <div class="actions">
+            <div class="action-card">
+                <h3>🔑 Registrar com Passkey</h3>
+                <p>Registre-se usando autenticação WebAuthn (TouchID, FaceID, YubiKey)</p>
+                <button class="btn" onclick="registerPasskey()">Registrar Passkey</button>
+            </div>
+            
+            <div class="action-card">
+                <h3>👤 Registrar Biometria</h3>
+                <p>Registre template biométrico criptografado</p>
+                <button class="btn btn-secondary" onclick="registerBiometric()">Registrar Biometria</button>
+            </div>
+            
+            <div class="action-card">
+                <h3>🌐 Conectar Peer</h3>
+                <p>Conectar a outro nó da rede P2P</p>
+                
+                <div style="margin: 10px 0;">
+                    <label style="display: block; margin-bottom: 5px;">Conexão Automática (recomendado):</label>
+                    <input type="number" id="peer-http-port" placeholder="3000" value="3000" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 100px;">
+                    <button class="btn" onclick="connectPeerAuto()" style="margin-left: 10px;">🔍 Conectar Auto</button>
+                </div>
+                
+                <div style="margin: 10px 0; padding-top: 10px; border-top: 1px solid #eee;">
+                    <label style="display: block; margin-bottom: 5px;">Conexão Manual (WebSocket):</label>
+                    <input type="text" id="peer-address" placeholder="localhost:8087" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 150px;">
+                    <button class="btn btn-secondary" onclick="connectPeer()" style="margin-left: 10px;">🔗 Conectar Manual</button>
+                </div>
+                
+                <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                    💡 Use conexão automática para conectar via porta HTTP (3000, 3001, etc.)<br>
+                    🔧 Use conexão manual apenas se souber a porta WebSocket específica
+                </div>
+            </div>
+            
+            <div class="action-card">
+                <h3>🔄 Sincronizar Rede</h3>
+                <p>Forçar sincronização com peers conectados</p>
+                <button class="btn btn-secondary" onclick="syncNetwork()">Sincronizar</button>
+            </div>
+        </div>
+        
+        <div id="status-display">
+            <strong>Status:</strong> <span id="status-text">Carregando...</span>
+        </div>
+        
+        <div class="api-endpoints">
+            <h3>📡 Endpoints da API</h3>
+            <div class="endpoint">
+                <span><span class="method get">GET</span> /status</span>
+                <button class="btn" onclick="testEndpoint('/status')">Testar</button>
+            </div>
+            <div class="endpoint">
+                <span><span class="method post">POST</span> /api/auth/register/passkey</span>
+                <button class="btn" onclick="testEndpoint('/api/auth/register/passkey', 'POST')">Testar</button>
+            </div>
+            <div class="endpoint">
+                <span><span class="method get">GET</span> /api/p2p/status</span>
+                <button class="btn" onclick="testEndpoint('/api/p2p/status')">Testar</button>
+            </div>
+            <div class="endpoint">
+                <span><span class="method get">GET</span> /api/admin/stats</span>
+                <button class="btn" onclick="testEndpoint('/api/admin/stats')">Testar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Atualiza dashboard com dados do sistema
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                const dashboard = document.getElementById('dashboard');
+                dashboard.innerHTML = '';
+                
+                // Card de Autenticação
+                const authCard = createCard('🔐 Autenticação', [
+                    { label: 'Passkeys Registradas', value: data.components.auth.stats.passkeys.totalCredentials },
+                    { label: 'Templates Biométricos', value: data.components.auth.stats.biometrics.totalTemplates },
+                    { label: 'Usuários Totais', value: data.components.auth.stats.totalUsers },
+                    { label: 'Challenges Ativos', value: data.components.auth.stats.passkeys.activeChallenges }
+                ]);
+                dashboard.appendChild(authCard);
+                
+                // Card de Rede P2P
+                const networkCard = createCard('🌐 Rede P2P', [
+                    { label: 'ID do Nó', value: data.components.network.stats.nodeId.substring(0, 12) + '...' },
+                    { label: 'Porta', value: data.components.network.stats.port },
+                    { label: 'Peers Conectados', value: data.components.network.stats.connectedPeers },
+                    { label: 'Status', value: data.components.network.stats.isStarted ? 'Ativo' : 'Inativo' }
+                ]);
+                dashboard.appendChild(networkCard);
+                
+                // Card de Ledger
+                const ledgerCard = createCard('📊 Ledger Local', [
+                    { label: 'Identidades', value: data.components.ledger.stats.totalIdentities },
+                    { label: 'Versão', value: data.components.ledger.stats.version },
+                    { label: 'Última Sincronização', value: new Date(data.components.ledger.stats.lastSync).toLocaleString() }
+                ]);
+                dashboard.appendChild(ledgerCard);
+                
+                // Card de Consenso
+                const consensusCard = createCard('⚖️ Consenso', [
+                    { label: 'Participantes', value: data.components.consensus.stats.totalParticipants },
+                    { label: 'Propostas Pendentes', value: data.components.consensus.stats.pendingProposals },
+                    { label: 'Threshold', value: data.components.consensus.stats.consensusThreshold }
+                ]);
+                dashboard.appendChild(consensusCard);
+                
+                // Card de DHT
+                const dhtCard = createCard('🗂️ DHT', [
+                    { label: 'Nós Conhecidos', value: data.components.dht.stats.totalNodes },
+                    { label: 'Entradas Totais', value: data.components.dht.stats.totalEntries },
+                    { label: 'Buckets Ativos', value: data.components.dht.stats.activeBuckets }
+                ]);
+                dashboard.appendChild(dhtCard);
+                
+                // Card de Gossip
+                const gossipCard = createCard('💬 Gossip Protocol', [
+                    { label: 'Peers', value: data.components.gossip.stats.totalPeers },
+                    { label: 'Mensagens Enviadas', value: data.components.gossip.stats.totalMessagesSent },
+                    { label: 'Mensagens Recebidas', value: data.components.gossip.stats.totalMessagesReceived }
+                ]);
+                dashboard.appendChild(gossipCard);
+                
+                document.getElementById('status-text').textContent = 'Sistema ativo e funcionando corretamente';
+                
+            } catch (error) {
+                console.error('Erro ao buscar status:', error);
+                document.getElementById('status-text').textContent = 'Erro ao conectar com o servidor';
+            }
+        }
+        
+        function createCard(title, stats) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            let statsHtml = stats.map(stat => 
+                `<div class="stats">
+                    <span>${stat.label}:</span>
+                    <span class="stats-value">${stat.value}</span>
+                </div>`
+            ).join('');
+            
+            card.innerHTML = `
+                <h3>${title}</h3>
+                ${statsHtml}
+                <span class="status active">Ativo</span>
+            `;
+            
+            return card;
+        }
+        
+        async function registerPasskey() {
+            try {
+                const userId = 'user_' + Date.now();
+                const response = await fetch('/api/auth/register/passkey', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        userName: 'Usuário Demo',
+                        userDisplayName: 'Demo'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Opções de registro geradas com sucesso! Em um app real, isso ativaria o WebAuthn.');
+                    console.log('Registration options:', data.registrationOptions);
+                } else {
+                    alert('Erro no registro: ' + data.error);
+                }
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+        
+        async function registerBiometric() {
+            try {
+                const userId = 'bio_user_' + Date.now();
+                const response = await fetch('/api/auth/register/biometric', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        biometricData: 'demo_fingerprint_data_' + Math.random(),
+                        biometricType: 'fingerprint'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('Biometria registrada com sucesso!');
+                    updateDashboard();
+                } else {
+                    alert('Erro no registro biométrico: ' + data.error);
+                }
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+        
+        async function connectPeerAuto() {
+            const httpPort = document.getElementById('peer-http-port').value || '3000';
+            
+            try {
+                const response = await fetch('/api/network/connect-auto', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        httpPort: parseInt(httpPort)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ ${data.message}\n\n` +
+                          `🔍 Descoberto: HTTP:${data.discoveredPorts.http} → WebSocket:${data.discoveredPorts.websocket}\n` +
+                          `🆔 Nós conectados: ${data.nodeInfo.localNodeId} ↔ ${data.nodeInfo.remoteNodeId}`);
+                    updateDashboard();
+                } else {
+                    alert(`❌ ${data.message}`);
+                }
+            } catch (error) {
+                alert('Erro na conexão automática: ' + error.message);
+            }
+        }
+        
+        async function connectPeer() {
+            const address = document.getElementById('peer-address').value || 'localhost:8087';
+            const [host, port] = address.split(':');
+            
+            try {
+                const response = await fetch('/api/network/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        address: host,
+                        port: parseInt(port)
+                    })
+                });
+                
+                const data = await response.json();
+                alert(data.message);
+                if (data.success) {
+                    updateDashboard();
+                }
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+        
+        async function syncNetwork() {
+            try {
+                const response = await fetch('/api/p2p/sync', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                alert(data.message);
+                updateDashboard();
+            } catch (error) {
+                alert('Erro: ' + error.message);
+            }
+        }
+        
+        async function testEndpoint(endpoint, method = 'GET') {
+            try {
+                const options = { method };
+                
+                if (method === 'POST' && endpoint.includes('register/passkey')) {
+                    options.headers = { 'Content-Type': 'application/json' };
+                    options.body = JSON.stringify({
+                        userId: 'test_user',
+                        userName: 'Test User',
+                        userDisplayName: 'Test'
+                    });
+                }
+                
+                const response = await fetch(endpoint, options);
+                const data = await response.json();
+                
+                const popup = window.open('', '_blank', 'width=600,height=400');
+                popup.document.write(`
+                    <html>
+                        <head><title>Resposta da API</title></head>
+                        <body style="font-family: monospace; padding: 20px;">
+                            <h3>${method} ${endpoint}</h3>
+                            <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow: auto;">
+${JSON.stringify(data, null, 2)}
+                            </pre>
+                        </body>
+                    </html>
+                `);
+            } catch (error) {
+                alert('Erro ao testar endpoint: ' + error.message);
+            }
+        }
+        
+        // Atualiza dashboard automaticamente
+        updateDashboard();
+        setInterval(updateDashboard, 10000); // Atualiza a cada 10 segundos
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## 🚀 Release ${{ github.ref }}
+
+            ### Componentes
+            - **Core Backend**: Sistema P2P e Blockchain
+            - **Mobile App**: Aplicativo React Native
+            - **Website**: Demo Next.js
+            - **SDK**: Biblioteca de integração
+
+            ### Instalação
+            ```bash
+            git clone https://github.com/seu-usuario/IdentityVault.git
+            cd IdentityVault
+            ./setup.sh
+            ```
+
+            ### Documentação
+            Veja o [README](README.md) para instruções completas.
+          draft: false
+          prerelease: false

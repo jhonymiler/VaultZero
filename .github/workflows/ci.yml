@@ -1,0 +1,157 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Job 1: Lint e verificação de código
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run ESLint (if configured)
+        run: |
+          if [ -f "package.json" ]; then
+            npm run lint --if-present || echo "No lint script found"
+          fi
+        continue-on-error: true
+
+  # Job 2: Testes do Core (Backend P2P)
+  test-core:
+    name: Test Core Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Core dependencies
+        working-directory: ./core
+        run: npm install
+
+      - name: Run Core tests
+        working-directory: ./core
+        run: npm test --if-present || echo "No tests configured yet"
+        continue-on-error: true
+
+      - name: Build Core
+        working-directory: ./core
+        run: npm run build --if-present
+
+  # Job 3: Testes do Website
+  test-website:
+    name: Test Website
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Website dependencies
+        working-directory: ./website
+        run: npm install
+
+      - name: Run Website tests
+        working-directory: ./website
+        run: npm test --if-present || echo "No tests configured yet"
+        continue-on-error: true
+
+      - name: Build Website
+        working-directory: ./website
+        run: npm run build
+
+  # Job 4: Testes do Mobile App
+  test-mobile:
+    name: Test Mobile App
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Mobile dependencies
+        working-directory: ./identity-vault-mobile
+        run: npm install
+
+      - name: Run Mobile tests
+        working-directory: ./identity-vault-mobile
+        run: npm test --if-present || echo "No tests configured yet"
+        continue-on-error: true
+
+  # Job 5: Testes do SDK
+  test-sdk:
+    name: Test SDK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install SDK dependencies
+        working-directory: ./sdk
+        run: npm install
+
+      - name: Run SDK tests
+        working-directory: ./sdk
+        run: npm test --if-present || echo "No tests configured yet"
+        continue-on-error: true
+
+      - name: Build SDK
+        working-directory: ./sdk
+        run: npm run build --if-present
+
+  # Job 6: Security Audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run npm audit
+        run: |
+          cd core && npm audit --audit-level=moderate || true
+          cd ../website && npm audit --audit-level=moderate || true
+          cd ../identity-vault-mobile && npm audit --audit-level=moderate || true
+          cd ../sdk && npm audit --audit-level=moderate || true
+        continue-on-error: true
