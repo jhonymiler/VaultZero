@@ -91,7 +91,7 @@ cd website && npm install && npm run dev
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 1. Fork the repository
-2. Clone: `git clone https://github.com/your-username/IdentityVault.git`
+2. Clone: `git clone https://github.com/jhonymiler/VaultZero.git`
 3. Install: `npm install`
 4. Develop your feature
 5. Submit a pull request
